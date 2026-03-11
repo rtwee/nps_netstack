@@ -26,4 +26,25 @@ typedef struct __attribute__((__packed__)) {
 }Arp_Hdr;
 
 
+// IP Header
+typedef struct __attribute__((__packed__)) {
+    uint8_t ihl:4;          // 首部长度
+    uint8_t version:4;      // 版本
+    uint8_t tos;            // 区分服务
+    uint16_t tot_len;       // 总长度
+    uint16_t id;            // 标识，用来区分是哪个数据包
+    union {
+        uint16_t v;
+        struct {            // 标志分片和偏移信息的
+            uint16_t fo:13;
+            uint16_t flag:3;
+        };
+    }ff;
+    uint8_t ttl;            // 生存时间
+    uint8_t proto;          // 协议
+    uint16_t checksum;      // 校验码
+    uint32_t src_ip;
+    uint32_t dst_ip;
+}Ip_Hdr;
+
 #endif

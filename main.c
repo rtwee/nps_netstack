@@ -2,6 +2,8 @@
 #include "global.h"
 #include <stdio.h>
 
+#include "protc.h"
+
 int main(void) {
     // device_info();
     pcap_if_t *alldevs = NULL;
@@ -25,7 +27,7 @@ int main(void) {
 #ifdef USE_FILTER
     // 设置过滤器
     struct bpf_program filter;
-    char filter_exp[]="arp";
+    char filter_exp[]="arp or ip";
     bpf_u_int32 net = 0;
     // 编译过滤器
     if (pcap_compile(handle,&filter,filter_exp,0,net) == -1) {
@@ -38,11 +40,16 @@ int main(void) {
     }
 #endif
 
-
     //开始抓包
     pcap_loop(handle,5,device_handler,NULL);
 
-    pcap_close(handle);
 
+    // 发送ARP Request
+    // for (int i = 0;i < 10;++i){
+    //     arp_send(handle,"192.168.1.222",ARP_REQUEST);
+    // }
+
+    pcap_close(handle);
+    pcap_freealldevs(alldevs);
     return 0;
 }

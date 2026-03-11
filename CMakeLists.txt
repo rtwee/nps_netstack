@@ -16,6 +16,7 @@ add_executable(nps_netstack
         src/device.c
         src/ethii.c
         src/arp.c
+        src/ip.c
 )
 
 target_link_libraries(nps_netstack

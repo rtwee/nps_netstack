@@ -42,5 +42,6 @@ void eth_ii_print(const EthII_Hdr * eth_ii) {
         printf("%x",eth_ii->source_mac[i]);
         if (i+1 < ETH_II_MAC_LEN) printf(":");
     }
+    printf("\n");
 
 }

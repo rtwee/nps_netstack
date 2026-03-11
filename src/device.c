@@ -114,6 +114,10 @@ void device_handler(unsigned char * user,const struct pcap_pkthdr * header,const
             Arp_Hdr * arp_hdr = arp_parse(data);
             arp_print(arp_hdr);
             break;
+        case ETH_II_TYPE_IPV4:
+            const Ip_Hdr * ip = ip_parse(data);
+            ip_print(ip);
+            break;
         default:
             printf("\nUnknown packet type: %d\n",eth_ii->type);
             break;
