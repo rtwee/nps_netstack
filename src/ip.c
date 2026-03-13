@@ -2,7 +2,9 @@
 #include "hdr.h"
 #include "global.h"
 
-static uint16_t checksum(void * data,int len) {
+Icmp_Hdr * icmp_hdr;
+
+uint16_t checksum(void * data,int len) {
     uint32_t sum = 0;
     uint16_t * ptr = data;
     // 遍历数据，按照16位单元累加
@@ -29,8 +31,11 @@ static uint16_t checksum(void * data,int len) {
 
 Ip_Hdr * ip_parse(const unsigned char *data) {
     Ip_Hdr * ip = malloc(sizeof(Ip_Hdr));
+
+
     if (ip == NULL) return NULL;
     memcpy(ip,data,sizeof(Ip_Hdr));
+
     if (ip_checksum(ip) == FALSE) return NULL;
 
     ip->tot_len = ntohs(ip->tot_len);
@@ -39,6 +44,13 @@ Ip_Hdr * ip_parse(const unsigned char *data) {
     ip->checksum=ntohs(ip->checksum);
     ip->src_ip=ntohl(ip->src_ip);
     ip->dst_ip=ntohl(ip->dst_ip);
+
+    // 判断上层协议类型
+    if (ip->proto == IP_TOP_ICMP) {
+        uint16_t hl = ip->ihl * 4;
+        icmp_hdr = icmp_parse(data+hl,ip->tot_len - hl);
+    }
+
     return ip;
 }
 extern char * get_ip_str(uint32_t ip);
@@ -54,7 +66,13 @@ void ip_print(const Ip_Hdr * ip_hdr) {
     }
 
     printf("\t\t %s -> %s\n",get_ip_str(ip_hdr->src_ip),get_ip_str(ip_hdr->dst_ip));
+
+    // 判断协议类型
+    if (ip_hdr->proto == IP_TOP_ICMP) {
+        icmp_print(icmp_hdr);
+    }
 }
+
 
 BOOL ip_checksum(Ip_Hdr * ip_hdr) {
     // 计算校验和

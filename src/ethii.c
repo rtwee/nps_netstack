@@ -29,6 +29,9 @@ void eth_ii_print(const EthII_Hdr * eth_ii) {
     else if (eth_ii->type == 0x86DD) {
         printf("Ethernet type: IPv6\n");
     }
+    else if (eth_ii->type == 0x8100) {
+        printf("Ethernet type: VLAN\n"); //内网划分的
+    }
     else {
         printf("Ethernet type: Unknown\n");
     }

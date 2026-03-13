@@ -17,6 +17,8 @@ add_executable(nps_netstack
         src/ethii.c
         src/arp.c
         src/ip.c
+        src/icmp.c
+        src/vlan.c
 )
 
 target_link_libraries(nps_netstack

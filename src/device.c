@@ -109,6 +109,18 @@ void device_handler(unsigned char * user,const struct pcap_pkthdr * header,const
 
     data+=sizeof(EthII_Hdr);
 
+    // 如果有VLAN的使用的话
+    if (eth_ii->type == ETH_II_TYPE_VLAN) {
+        data -= 2; // 现在超出了
+        Vlan_Hdr * vlan_hdr = vlan_parse(data);
+        vlan_print(vlan_hdr);
+        data += (sizeof(Vlan_Hdr));
+        eth_ii->type = *(uint16_t*)data;
+        eth_ii->type = htons(eth_ii->type);
+        data+=2;
+    }
+
+
     switch (eth_ii->type) {
         case ETH_II_TYPE_ARP:
             Arp_Hdr * arp_hdr = arp_parse(data);

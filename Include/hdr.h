@@ -12,6 +12,19 @@ typedef struct __attribute__((__packed__)){
     uint16_t type;  //标识类型
 }EthII_Hdr;
 
+// VLAN Header
+typedef struct __attribute__((__packed__)){
+    uint16_t tpid;   //固定值0x8100
+    union {
+        uint16_t pcv;
+        struct {
+            uint16_t vid:12;
+            uint16_t cfi:1;
+            uint16_t pri:3;
+        };
+    }pcv;
+}Vlan_Hdr;
+
 // ARP Header
 typedef struct __attribute__((__packed__)) {
     uint16_t h_type; // 硬件类型 以太网是1标识
@@ -28,8 +41,8 @@ typedef struct __attribute__((__packed__)) {
 
 // IP Header
 typedef struct __attribute__((__packed__)) {
-    uint8_t ihl:4;          // 首部长度
-    uint8_t version:4;      // 版本
+    uint8_t ihl:4;          // 首部长度    head长度在低位
+    uint8_t version:4;      // 版本       version在高位
     uint8_t tos;            // 区分服务
     uint16_t tot_len;       // 总长度
     uint16_t id;            // 标识，用来区分是哪个数据包
@@ -46,5 +59,14 @@ typedef struct __attribute__((__packed__)) {
     uint32_t src_ip;
     uint32_t dst_ip;
 }Ip_Hdr;
+
+
+
+// ICMP Header
+typedef struct __attribute__((__packed__)) {
+    uint8_t type;
+    uint8_t code;       //和type共同作用
+    uint16_t checksum;  //这个校验和是包含数据的
+}Icmp_Hdr;
 
 #endif

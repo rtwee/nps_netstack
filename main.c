@@ -27,8 +27,10 @@ int main(void) {
 #ifdef USE_FILTER
     // 设置过滤器
     struct bpf_program filter;
-    char filter_exp[]="arp or ip";
+    // char filter_exp[]="arp or ip";
+    char filter_exp[]="icmp";
     bpf_u_int32 net = 0;
+
     // 编译过滤器
     if (pcap_compile(handle,&filter,filter_exp,0,net) == -1) {
         printf("could not parse filter %s : %s\n",filter_exp,pcap_geterr(handle));

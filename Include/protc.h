@@ -8,6 +8,10 @@
 EthII_Hdr * eth_ii_parse(const unsigned char *packet);
 void eth_ii_print(const EthII_Hdr * eth_ii);
 
+// VLAN解析
+Vlan_Hdr * vlan_parse(const unsigned char *packet);
+void vlan_print(const Vlan_Hdr * vlan_hdr);
+
 // ARP接口
 #define ARP_GRATUITOUS  1
 #define ARP_REQUEST 2
@@ -19,5 +23,11 @@ int arp_send(pcap_t * handle,char * tpa,uint8_t type);
 BOOL ip_checksum(Ip_Hdr * ip_hdr);
 Ip_Hdr * ip_parse(const unsigned char *data);
 void ip_print(const Ip_Hdr * ip_hdr);
+
+
+// ICMP协议接口
+Icmp_Hdr * icmp_parse(const unsigned char *data,uint16_t length);
+BOOL icmp_checksum(Icmp_Hdr * icmp_hdr,uint16_t length);
+void icmp_print(const Icmp_Hdr * icmp_hdr);
 
 #endif
