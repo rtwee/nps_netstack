@@ -4,6 +4,7 @@
 #include "hdr.h"
 #include "protc.h"
 #include "global.h"
+#include "stack.h"
 
 void device_info()
 {
@@ -98,41 +99,98 @@ void print_dev_info(pcap_if_t * dev) {
 }
 
 void device_handler(unsigned char * user,const struct pcap_pkthdr * header,const u_char * packet) {
-    printf("\nPacket captured:\n");
+    printf("----------------------------------------\n");
+    printf("Packet captured:\n");
     printf("Timestamp: %ld.%ld seconds\n",header->ts.tv_sec,header->ts.tv_usec);
     printf("Packet length: %d\n",header->len);
 
     const unsigned char * data = (const unsigned char *)packet;
 
-    EthII_Hdr * eth_ii = eth_ii_parse(data);
-    eth_ii_print(eth_ii);
+    Stack * stack = stack_new();
+    int top_type = SP_ETH;
+    do {
+        switch (top_type) {
+            default:
+                printf("\nUnknown packet type\n");
+                return;
+            case SP_ETH: {
+                // 以太网帧
+                EthII_Hdr * eth_ii = eth_ii_parse(data);
+                // 获取上层协议类型
+                if (eth_ii->type == ETH_II_TYPE_VLAN) {
+                    top_type = SP_VLAN;
+                } else if (eth_ii->type == ETH_II_TYPE_IPV4) {
+                    top_type = SP_IPv4;
+                } else if (eth_ii->type == ETH_II_TYPE_ARP) {
+                    top_type = SP_ARP;
+                } else {
+                  return;
+                }
+                // 协议解析完成
+                stack_push(stack,eth_ii,top_type);
+                // 偏移
+                data+=sizeof(EthII_Hdr);
+                eth_ii_print(eth_ii);
+                break;
+            }
+            case SP_ARP: {
+                Arp_Hdr * arp_hdr = arp_parse(data);
+                top_type = SP_NULL;
+                stack_push(stack,arp_hdr,top_type);
+                arp_print(arp_hdr);
+                break;
+            }
+            case SP_IPv4: {
+                Ip_Hdr * ip = ip_parse(data);
+                // 获取上层协议类型
+                if (ip->proto == IP_TOP_TCP) {
+                    top_type = SP_TCP;
+                } else if (ip->proto == IP_TOP_UDP) {
+                    top_type = SP_UDP;
+                } else if (ip->proto == IP_TOP_ICMP) {
+                    top_type = SP_ICMP;
+                }
+                stack_push(stack,ip,top_type);
+                data+=(ip->ihl*4);
 
-    data+=sizeof(EthII_Hdr);
+                ip_print(ip);
+                break;
+            }
+            case SP_ICMP: {
+                const StackNode * node = stack_top(stack);
+                const uint16_t len = ((Ip_Hdr*)node->data)->tot_len - (((Ip_Hdr*)node->data)->ihl * 4);
+                Icmp_Hdr * icmp_hdr = icmp_parse(data,len);
+                top_type = SP_NULL;
+                stack_push(stack,icmp_hdr,top_type);
+                icmp_print(icmp_hdr);
+                break;
+            }
+            case SP_VLAN: {
+                data -= 2; // 现在超出了
+                Vlan_Hdr * vlan_hdr = vlan_parse(data);
+                data += (sizeof(Vlan_Hdr));
 
-    // 如果有VLAN的使用的话
-    if (eth_ii->type == ETH_II_TYPE_VLAN) {
-        data -= 2; // 现在超出了
-        Vlan_Hdr * vlan_hdr = vlan_parse(data);
-        vlan_print(vlan_hdr);
-        data += (sizeof(Vlan_Hdr));
-        eth_ii->type = *(uint16_t*)data;
-        eth_ii->type = htons(eth_ii->type);
-        data+=2;
-    }
+                // 此时上层协议一定是Eth_ii
+                const StackNode * node = stack_top(stack);
+                EthII_Hdr * eth_ii = node->data;
+                eth_ii->type = *(uint16_t*)data;
+                eth_ii->type = htons(eth_ii->type);
+                vlan_print(vlan_hdr);
 
+                if (eth_ii->type == ETH_II_TYPE_IPV4) {
+                    top_type = SP_IPv4;
+                } else if (eth_ii->type == ETH_II_TYPE_ARP) {
+                    top_type = SP_ARP;
+                } else {
+                    return;
+                }
+                stack_push(stack,eth_ii,top_type);
+                data+=2;
+                break;
+            }
 
-    switch (eth_ii->type) {
-        case ETH_II_TYPE_ARP:
-            Arp_Hdr * arp_hdr = arp_parse(data);
-            arp_print(arp_hdr);
-            break;
-        case ETH_II_TYPE_IPV4:
-            const Ip_Hdr * ip = ip_parse(data);
-            ip_print(ip);
-            break;
-        default:
-            printf("\nUnknown packet type: %d\n",eth_ii->type);
-            break;
-    }
+        }
+    }while (top_type != SP_NULL);
+
 
 }

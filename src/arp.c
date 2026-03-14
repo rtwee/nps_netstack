@@ -44,7 +44,7 @@ Arp_Hdr * arp_parse(const unsigned char *packet) {
 
 void arp_print(const Arp_Hdr * arp_hdr) {
     if (arp_hdr->p_type == ETH_II_TYPE_IPV4) {
-        printf("\t\twho has %s,tell %s \n",get_ip_str(arp_hdr->tpa),get_ip_str(arp_hdr->spa));
+        printf("who has %s,tell %s \n",get_ip_str(arp_hdr->tpa),get_ip_str(arp_hdr->spa));
     }
     printf("operator op:%d\n",arp_hdr->operate);
 }

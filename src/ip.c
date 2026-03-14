@@ -2,7 +2,6 @@
 #include "hdr.h"
 #include "global.h"
 
-Icmp_Hdr * icmp_hdr;
 
 uint16_t checksum(void * data,int len) {
     uint32_t sum = 0;
@@ -45,32 +44,23 @@ Ip_Hdr * ip_parse(const unsigned char *data) {
     ip->src_ip=ntohl(ip->src_ip);
     ip->dst_ip=ntohl(ip->dst_ip);
 
-    // 判断上层协议类型
-    if (ip->proto == IP_TOP_ICMP) {
-        uint16_t hl = ip->ihl * 4;
-        icmp_hdr = icmp_parse(data+hl,ip->tot_len - hl);
-    }
-
     return ip;
 }
 extern char * get_ip_str(uint32_t ip);
 
 void ip_print(const Ip_Hdr * ip_hdr) {
-    printf("\t\t Header:%u bytes , Total: %u bytes\n",ip_hdr->ihl * 4,ip_hdr->tot_len);
-    printf("\t\t CHK:%#4x \n",ip_hdr->checksum);
-    printf("\t\t TTL:%u \n",ip_hdr->ttl);
+    printf("\t Header:%u bytes , Total: %u bytes\n",ip_hdr->ihl * 4,ip_hdr->tot_len);
+    printf("\t CHK:%#4x \n",ip_hdr->checksum);
+    printf("\t TTL:%u \n",ip_hdr->ttl);
     if (ip_hdr->proto == IP_TOP_TCP) {
-        printf("\t\t PROTO: TCP \n");
+        printf("\t PROTO: TCP \n");
     } else if (ip_hdr->proto == IP_TOP_UDP) {
-        printf("\t\t PROTO: UDP \n");
+        printf("\t PROTO: UDP \n");
     }
 
-    printf("\t\t %s -> %s\n",get_ip_str(ip_hdr->src_ip),get_ip_str(ip_hdr->dst_ip));
+    printf("\t %s -> %s\n",get_ip_str(ip_hdr->src_ip),get_ip_str(ip_hdr->dst_ip));
 
-    // 判断协议类型
-    if (ip_hdr->proto == IP_TOP_ICMP) {
-        icmp_print(icmp_hdr);
-    }
+
 }
 
 

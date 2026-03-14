@@ -23,7 +23,7 @@ BOOL icmp_checksum(Icmp_Hdr * icmp_hdr,uint16_t length) {
 
 void icmp_print(const Icmp_Hdr * icmp_hdr) {
     if (icmp_hdr == NULL) return;
-    printf("\t\t\t ICMP:\n\t\t\t\t  TYPE: ");
+    printf("\t\t ICMP:\t\t  TYPE: ");
     if (icmp_hdr->type == 0 && icmp_hdr->code == 0) {
         printf("Echo Replay\n");
     }
