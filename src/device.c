@@ -188,6 +188,16 @@ void device_handler(unsigned char * user,const struct pcap_pkthdr * header,const
                 data+=2;
                 break;
             }
+            case SP_UDP: {
+                const StackNode * node = stack_top(stack);
+                const uint16_t len = ((Ip_Hdr*)node->data)->tot_len - (((Ip_Hdr*)node->data)->ihl * 4); // UDP的长度
+                Udp_Hdr * udp_hdr = udp_parse(data,len);
+                top_type = SP_NULL;
+                stack_push(stack,udp_hdr,top_type);
+                data+=len;
+                udp_print(udp_hdr);
+                break;
+            }
 
         }
     }while (top_type != SP_NULL);

@@ -38,7 +38,6 @@ typedef struct __attribute__((__packed__)) {
     uint32_t tpa;                    //目的IP
 }Arp_Hdr;
 
-
 // IP Header
 typedef struct __attribute__((__packed__)) {
     uint8_t ihl:4;          // 首部长度    head长度在低位
@@ -60,13 +59,21 @@ typedef struct __attribute__((__packed__)) {
     uint32_t dst_ip;
 }Ip_Hdr;
 
-
-
 // ICMP Header
 typedef struct __attribute__((__packed__)) {
     uint8_t type;
     uint8_t code;       //和type共同作用
     uint16_t checksum;  //这个校验和是包含数据的
+    uint8_t data[];
 }Icmp_Hdr;
+
+// UDP Header
+typedef struct __attribute__((__packed__)) {
+    uint16_t sp;    //源端口
+    uint16_t tp;    //目的端口
+    uint16_t length;
+    uint16_t checksum;
+    uint8_t data[];
+}Udp_Hdr;
 
 #endif

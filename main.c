@@ -28,7 +28,7 @@ int main(void) {
     // 设置过滤器
     struct bpf_program filter;
     // char filter_exp[]="arp or ip";
-    char filter_exp[]="icmp";
+    char filter_exp[]="udp";
     bpf_u_int32 net = 0;
 
     // 编译过滤器

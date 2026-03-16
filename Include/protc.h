@@ -30,4 +30,10 @@ Icmp_Hdr * icmp_parse(const unsigned char *data,uint16_t length);
 BOOL icmp_checksum(Icmp_Hdr * icmp_hdr,uint16_t length);
 void icmp_print(const Icmp_Hdr * icmp_hdr);
 
+
+// UDP协议接口
+Udp_Hdr * udp_parse(const unsigned char *data,uint16_t length);
+BOOL udp_checksum(Udp_Hdr * udp_hdr,uint16_t len);
+void udp_print(const Udp_Hdr * udp);
+
 #endif

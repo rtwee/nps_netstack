@@ -60,7 +60,6 @@ void ip_print(const Ip_Hdr * ip_hdr) {
 
     printf("\t %s -> %s\n",get_ip_str(ip_hdr->src_ip),get_ip_str(ip_hdr->dst_ip));
 
-
 }
 
 
