@@ -21,6 +21,7 @@ add_executable(nps_netstack
         src/vlan.c
         src/stack.c
         src/udp.c
+        src/tcp.c
 )
 
 target_link_libraries(nps_netstack

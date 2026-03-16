@@ -36,4 +36,8 @@ Udp_Hdr * udp_parse(const unsigned char *data,uint16_t length);
 BOOL udp_checksum(Udp_Hdr * udp_hdr,uint16_t len);
 void udp_print(const Udp_Hdr * udp);
 
+// TCP协议解析
+Tcp_Hdr * tcp_parse(const unsigned char *data);
+BOOL tcp_checksum(Tcp_Hdr * tcp_hdr,uint16_t length);
+void tcp_print(const Tcp_Hdr * tcp_hdr);
 #endif

@@ -76,4 +76,25 @@ typedef struct __attribute__((__packed__)) {
     uint8_t data[];
 }Udp_Hdr;
 
+// TCP Header
+typedef struct __attribute__((__packed__)) {
+    uint16_t sp;
+    uint16_t tp;
+    uint32_t seq;
+    uint32_t ack;
+
+    union {
+        uint16_t v;
+        struct {
+            uint16_t flags:6;
+            uint16_t unused:6;
+            uint16_t offset:4;
+        };
+    }ff;
+
+    uint16_t ws;
+    uint16_t checksum;
+    uint16_t up; // 紧急指针
+}Tcp_Hdr;
+
 #endif

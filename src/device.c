@@ -198,6 +198,14 @@ void device_handler(unsigned char * user,const struct pcap_pkthdr * header,const
                 udp_print(udp_hdr);
                 break;
             }
+            case SP_TCP: {
+                Tcp_Hdr * tcp_hdr = tcp_parse(data);
+                top_type = SP_NULL;
+                stack_push(stack,tcp_hdr,top_type);
+                data+=sizeof(Tcp_Hdr);
+                tcp_print(tcp_hdr);
+                break;
+            }
 
         }
     }while (top_type != SP_NULL);

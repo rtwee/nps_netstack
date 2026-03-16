@@ -28,7 +28,7 @@ int main(void) {
     // 设置过滤器
     struct bpf_program filter;
     // char filter_exp[]="arp or ip";
-    char filter_exp[]="udp";
+    char filter_exp[]="tcp port 8080";
     bpf_u_int32 net = 0;
 
     // 编译过滤器
@@ -43,7 +43,7 @@ int main(void) {
 #endif
 
     //开始抓包
-    pcap_loop(handle,5,device_handler,NULL);
+    pcap_loop(handle,20,device_handler,NULL);
 
 
     // 发送ARP Request
